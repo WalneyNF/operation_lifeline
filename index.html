@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Operation Lifeline - Uma missão para salvar vidas</title>
+<style>
+  body { margin: 0; background: #0a0a12; color: #eee; font-family: monospace;
+         display: flex; flex-direction: column; align-items: center;
+         justify-content: center; min-height: 100vh; user-select: none; overflow: hidden; }
+  canvas { border: 2px solid #444; background: #000; image-rendering: pixelated;
+           box-shadow: 0 0 30px rgba(0,255,0,0.15); }
+  #hud { display: flex; gap: 12px; margin: 6px; font-size: 12px; flex-wrap: wrap; justify-content: center; }
+  #hud span { color: #0f0; }
+  #msg { color: #ff0; height: 16px; margin: 2px; font-size: 12px; }
+  #help { color: #888; font-size: 10px; margin-bottom: 4px; text-align: center; }
+  #radioMsg {
+    position: absolute; top: 85px; right: 15px; max-width: 280px;
+    background: rgba(0,20,0,0.9); border: 2px solid #0f0; border-radius: 6px;
+    padding: 8px 12px; font-size: 12px; color: #0f0; display: none; z-index: 4;
+  }
+  #radioMsg .from { color: #ff0; font-size: 10px; margin-bottom: 4px; }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.94);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 10; padding: 20px; box-sizing: border-box; overflow-y: auto;
+  }
+  .overlay h1 { color: #0f0; font-size: 42px; margin: 0 0 10px 0; text-shadow: 0 0 20px #0f0; }
+  .overlay h2 { color: #ff0; font-size: 20px; margin: 15px 0 10px 0; }
+  .overlay p { color: #aaa; margin: 6px 0; font-size: 14px; text-align: center; max-width: 700px; }
+  .blink { color: #ff0; animation: blink 1s infinite; margin-top: 20px; }
+  .footer-credits {
+    position: absolute;
+    bottom: 12px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #666;
+    font-size: 12px;
+    line-height: 1.5;
+    pointer-events: none;
+  }
+  .footer-credits .name {
+    color: #0f0;
+    font-weight: bold;
+    font-size: 13px;
+  }
+  .footer-credits .contact {
+    color: #888;
+  }
+  .footer-credits .version {
+    color: #ff0;
+    font-weight: bold;
+  }
+
+  @keyframes blink { 50% { opacity: 0.3; } }
+  .menu-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px 40px;
+    margin: 20px 0; background: #111a11; padding: 25px 40px;
+    border: 2px solid #0f0; border-radius: 10px; max-width: 850px;
+  }
+  .menu-col h2 { color: #0f0; font-size: 18px; margin: 0 0 12px 0;
+                 border-bottom: 1px solid #0f0; padding-bottom: 6px; }
+  .menu-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px; margin: 4px 0; background: #1a2a1a; border-radius: 4px;
+    cursor: pointer; transition: background 0.15s; font-size: 14px;
+  }
+  .menu-item:hover { background: #2a4a2a; }
+  .menu-item.selected { background: #0a3a0a; border-left: 4px solid #0f0; }
+  .menu-item .value { color: #ff0; font-weight: bold; }
+  .toggle-on { color: #0f0; }
+  .toggle-off { color: #a44; }
+  .btn {
+    background: #0a3a0a; color: #0f0; border: 2px solid #0f0;
+    padding: 10px 24px; font-family: monospace; font-size: 15px;
+    cursor: pointer; margin: 6px; border-radius: 4px; transition: all 0.15s;
+  }
+  .btn:hover { background: #0f0; color: #000; }
+  .btn.primary { background: #0f0; color: #000; font-weight: bold; }
+  .btn.primary:hover { background: #6f6; }
+  .btn.danger { background: #3a0a0a; border-color: #f44; color: #f44; }
+  .btn.danger:hover { background: #f44; color: #000; }
+
+  #rescuedPanel {
+    position: absolute; left: 20px; top: 80px; width: 280px; max-height: 260px;
+    background: rgba(0, 20, 0, 0.95); border: 2px solid #0f0; border-radius: 6px;
+    padding: 8px; font-size: 11px; overflow-y: auto; display: none; z-index: 5;
+    box-shadow: 0 0 20px rgba(0,255,0,0.6);
+  }
+  #rescuedPanel h3 { color: #0f0; margin: 0 0 6px 0; font-size: 13px;
+                     border-bottom: 1px solid #0f0; padding-bottom: 4px;
+                     position: sticky; top: 0; background: rgba(0,20,0,0.95); }
+  #rescuedPanel .entry { padding: 4px 6px; margin: 3px 0; background: #0a1a0a;
+                         border-left: 3px solid #0a0; border-radius: 3px; line-height: 1.3; }
+  #rescuedPanel .entry .rank { color: #ff0; font-weight: bold; }
+  #rescuedPanel .entry .name { color: #ddd; }
+  #rescuedPanel .entry .info { color: #888; font-size: 10px; }
+
+  #dialogueBox {
+    position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%);
+    background: rgba(0, 20, 0, 0.95); border: 3px solid #0f0; border-radius: 8px;
+    padding: 12px 20px; min-width: 400px; max-width: 600px;
+    display: none; z-index: 6; box-shadow: 0 0 20px rgba(0,255,0,0.4);
+  }
+  #dialogueBox .speaker { color: #ff0; font-weight: bold; font-size: 15px; margin-bottom: 6px; }
+  #dialogueBox .speech { color: #fff; font-size: 14px; font-style: italic; }
+
+  #storyPanel {
+    max-width: 800px; max-height: 88vh; overflow-y: auto;
+    background: #0a0a1a; border: 2px solid #0f0;
+    padding: 30px 40px; border-radius: 10px; text-align: left;
+  }
+  #storyPanel h1 { color: #f44; text-align: center; font-size: 30px; margin: 0 0 20px 0; }
+  #storyPanel h2 { color: #ff0; font-size: 19px; margin: 20px 0 10px 0; }
+  #storyPanel p { color: #ddd; font-size: 15px; line-height: 1.6; margin: 10px 0; text-align: left; }
+  #storyPanel .objective { color: #0f0; background: #0a2a0a; padding: 10px;
+                           border-left: 4px solid #0f0; margin: 15px 0; }
+
+  .upgrade-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+  .upgrade-card { background: #0a1a0a; border: 2px solid #0f0; border-radius: 8px;
+                  padding: 15px; cursor: pointer; transition: all 0.15s; }
+  .upgrade-card:hover { background: #1a4a1a; transform: scale(1.02); }
+  .upgrade-card h3 { color: #0f0; margin: 0 0 8px 0; font-size: 16px; }
+  .upgrade-card p { color: #aaa; font-size: 12px; margin: 4px 0; }
+  .upgrade-card .cost { color: #ff0; font-weight: bold; font-size: 14px; margin-top: 8px; }
+
+  .stats-table { width: 100%; max-width: 500px; margin: 15px auto;
+                 background: #0a1a0a; border: 2px solid #0f0; border-radius: 6px; padding: 12px; }
+  .stats-table tr { border-bottom: 1px solid #1a3a1a; }
+  .stats-table td { padding: 6px 10px; color: #ddd; font-size: 14px; }
+  .stats-table td:last-child { text-align: right; color: #0f0; font-weight: bold; }
+
+  .medal-display { display: flex; gap: 20px; justify-content: center; margin: 15px 0; }
+  .medal-item { text-align: center; }
+  .medal-item .emoji { font-size: 40px; display: block; }
+  .medal-item .label { font-size: 11px; color: #888; }
+  .medal-item.locked { opacity: 0.25; filter: grayscale(1); }
+
+  .skin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 15px 0; }
+  .skin-card { background: #0a1a0a; border: 2px solid #333; border-radius: 8px;
+               padding: 12px; cursor: pointer; text-align: center; }
+  .skin-card:hover { border-color: #0f0; }
+  .skin-card.selected { border-color: #0f0; background: #1a4a1a; }
+  .skin-card .preview { height: 40px; margin: 8px 0; display: flex;
+                        align-items: center; justify-content: center; }
+  .skin-card .name { color: #0f0; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div>Fase: <span id="phase">1</span></div>
+  <div>Salvos: <span id="saved">0</span>/40</div>
+  <div>A bordo: <span id="aboard">0</span>/16</div>
+  <div>Vidas: <span id="lives">3</span></div>
+  <div>Mira: <span id="dir">FRENTE</span></div>
+  <div>Score: <span id="score">0</span></div>
+  <div>XP: <span id="xp">0</span></div>
+  <div>Modo: <span id="modeLabel">ARCADE</span></div>
+</div>
+<canvas id="game" width="960" height="540"></canvas>
+<div id="msg"></div>
+<div id="help">← → ↑ ↓ mover | A gira mira | ESPAÇO/B atira | X baixa gancho | Z sobe gancho | C segue | V esconde | Q bomba | E kit | TAB mira assistida | M som | ESC menu</div>
+
+<div id="radioMsg">
+  <div class="from">📻 COMANDANTE:</div>
+  <div id="radioText"></div>
+</div>
+
+<div id="rescuedPanel">
+  <h3>📋 RESGATADOS (<span id="rescuedCount">0</span>)</h3>
+  <div id="rescuedList"></div>
+</div>
+
+<div id="dialogueBox">
+  <div class="speaker" id="dialogueSpeaker"></div>
+  <div class="speech" id="dialogueSpeech"></div>
+</div>
+
+<!-- MENU PRINCIPAL -->
+<div id="startOverlay" class="overlay">
+  <h1>🚁 Operation Lifeline 🚁</h1>
+  <p style="color:#f44; font-size:20px">Uma missão para salvar vidas</p>
+  <p style="color:#0f0">3 Campanhas — Chefes — Upgrades — Modo Zumbi</p>
+  <div style="margin-top: 30px; display:flex; flex-direction:column; align-items:center;">
+    <button class="btn primary" id="btnContinue" style="display:none">▶ CONTINUAR CAMPANHA</button>
+    <button class="btn primary" id="btnStory">📖 NOVA CAMPANHA</button>
+    <button class="btn primary" id="btnArcade">🎮 MODO ARCADE</button>
+    <button class="btn primary" id="btnZombie" style="background:#6a0a0a;border-color:#f44;color:#fff">🧟 MODO ZUMBI</button>
+    <div style="margin-top: 12px;">
+      <button class="btn" id="btnConfig">⚙️ CONFIGURAÇÕES</button>
+      <button class="btn" id="btnStats">📊 ESTATÍSTICAS</button>
+      <button class="btn" id="btnSkins">🎨 SKINS</button>
+      <button class="btn" id="btnRanking">🏅 RANKING</button>
+      <button class="btn" id="btnHelp">❓ AJUDA</button>
+    </div>
+  </div>
+  <p class="blink">▶ Escolha um modo</p>
+  <!-- RODAPÉ DE CRÉDITOS -->
+  <div class="footer-credits">
+    <span class="name">Walney Moreira Klein</span> — <span class="contact">walneyk@hotmail.com</span><br>
+    <span class="version">Versão 0.7</span>
+  </div>
+</div>
+
+</div>
+
+<!-- STORY -->
+<div id="storyOverlay" class="overlay" style="display:none">
+  <div id="storyPanel">
+    <h1 id="storyTitle"></h1>
+    <div id="storyContent"></div>
+    <div style="text-align: center; margin-top: 25px">
+      <button class="btn primary" id="storyContinue">▶ CONTINUAR</button>
+      <button class="btn danger" id="storyMainMenu">🏠 MENU PRINCIPAL</button>
+    </div>
+  </div>
+</div>
+
+<!-- UPGRADES -->
+<div id="upgradeOverlay" class="overlay" style="display:none">
+  <div style="max-width: 700px; text-align: center;">
+    <h1 style="color:#0f0;">⚡ FASE COMPLETA — ESCOLHA UM UPGRADE</h1>
+    <p style="color:#ff0; font-size:18px">XP disponível: <span id="upgradeXP">0</span></p>
+    <div class="upgrade-grid" id="upgradeGrid"></div>
+    <button class="btn" id="upgradeSkip" style="margin-top:15px">Pular (sem upgrade)</button>
+  </div>
+</div>
+
+<!-- CONFIGURAÇÕES -->
+<div id="menuOverlay" class="overlay" style="display:none">
+  <h1>⚙️ CONFIGURAÇÕES</h1>
+  <div class="menu-grid">
+    <div class="menu-col">
+      <h2>Dificuldade</h2>
+      <div class="menu-item" data-action="difficulty" data-value="easy"><span>🟢 Fácil</span><span class="value" id="diff-easy"></span></div>
+      <div class="menu-item" data-action="difficulty" data-value="normal"><span>🟡 Normal</span><span class="value" id="diff-normal"></span></div>
+      <div class="menu-item" data-action="difficulty" data-value="hard"><span>🟠 Difícil</span><span class="value" id="diff-hard"></span></div>
+      <div class="menu-item" data-action="difficulty" data-value="insane"><span>🔴 Insano</span><span class="value" id="diff-insane"></span></div>
+      <div class="menu-item" data-action="toggle" data-value="godmode"><span>🌟 Modo Sem Dano</span><span class="value" id="tog-godmode"></span></div>
+      <div class="menu-item" data-action="reset"><span>♻️ Resetar tudo</span></div>
+    </div>
+    <div class="menu-col">
+      <h2>Inimigos</h2>
+      <div class="menu-item" data-action="toggle" data-value="tank"><span>Tanque</span><span class="value" id="tog-tank"></span></div>
+      <div class="menu-item" data-action="toggle" data-value="plane"><span>Avião</span><span class="value" id="tog-plane"></span></div>
+      <div class="menu-item" data-action="toggle" data-value="aa"><span>Antiaérea</span><span class="value" id="tog-aa"></span></div>
+      <div class="menu-item" data-action="toggle" data-value="boat"><span>Barco</span><span class="value" id="tog-boat"></span></div>
+      <div class="menu-item" data-action="toggle" data-value="sub"><span>Submarino</span><span class="value" id="tog-sub"></span></div>
+      <div class="menu-item" data-action="toggle" data-value="mine"><span>Mina aérea</span><span class="value" id="tog-mine"></span></div>
+      <div class="menu-item" data-action="toggle" data-value="zombie"><span>Zumbi</span><span class="value" id="tog-zombie"></span></div>
+      <div class="menu-item" data-action="toggle" data-value="boss"><span>Chefe</span><span class="value" id="tog-boss"></span></div>
+      <div class="menu-item" data-action="toggle" data-value="alloff"><span>🚫 Desativar TODOS</span></div>
+      <div class="menu-item" data-action="toggle" data-value="allon"><span>✅ Ativar TODOS</span></div>
+    </div>
+  </div>
+  <div>
+    <button class="btn" id="menuBack">↩ Voltar</button>
+    <button class="btn primary" id="menuRestart">🔄 Reiniciar</button>
+    <button class="btn danger" id="menuMainMenu">🏠 Menu Principal</button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="statsOverlay" class="overlay" style="display:none">
+  <h1>📊 ESTATÍSTICAS</h1>
+  <table class="stats-table" id="statsTable"></table>
+  <h2 style="color:#ff0">🏆 MEDALHAS</h2>
+  <div class="medal-display" id="medalDisplay"></div>
+  <button class="btn" onclick="document.getElementById('statsOverlay').style.display='none'">↩ Voltar</button>
+</div>
+
+<!-- SKINS -->
+<div id="skinsOverlay" class="overlay" style="display:none">
+  <h1>🎨 ESCOLHA SUA SKIN</h1>
+  <div class="skin-grid" id="skinGrid"></div>
+  <button class="btn" onclick="document.getElementById('skinsOverlay').style.display='none'">↩ Voltar</button>
+</div>
+
+<!-- RANKING -->
+<div id="rankingOverlay" class="overlay" style="display:none">
+  <h1>🏅 TOP 5 MELHORES SCORES</h1>
+  <table class="stats-table" id="rankingTable"></table>
+  <button class="btn" onclick="document.getElementById('rankingOverlay').style.display='none'">↩ Voltar</button>
+</div>
+
+<!-- HELP -->
+<div id="helpOverlay" class="overlay" style="display:none">
+  <div id="storyPanel">
+    <h1>❓ COMO JOGAR</h1>
+    <h2>🎮 Controles</h2>
+    <p><strong>← →</strong> — Mover (inclina o helicóptero para o lado)<br>
+    <strong>↑ ↓</strong> — Subir / Descer<br>
+    <strong>A</strong> — Girar direção da mira (Frente → Direita → Trás → Esquerda)<br>
+    <strong>ESPAÇO</strong> ou <strong>B</strong> — Atirar na direção da mira<br>
+    <strong>X</strong> — Descer gancho de resgate<br>
+    <strong>Z</strong> — Subir gancho de resgate<br>
+    <strong>C</strong> — (segurar) Reféns livres seguem você<br>
+    <strong>V</strong> — (segurar) Reféns livres se escondem<br>
+    <strong>Q</strong> — Bomba especial (cooldown 20s)<br>
+    <strong>E</strong> — Kit médico (+1 vida, cooldown 60s)<br>
+    <strong>TAB</strong> — Mira assistida (atira no inimigo mais próximo)<br>
+    <strong>M</strong> — Mutar som<br>
+    <strong>ESC</strong> — Menu de configurações</p>
+    <h2>🎯 Dicas</h2>
+    <p>• Tanques só morrem com bomba (mira FRENTE)<br>
+    • Aviões/AA só morrem com metralhadora (mira LATERAL)<br>
+    • Quartéis só morrem com metralhadora<br>
+    • Pouse na base para entregar reféns<br>
+    • Não pouse em cima dos reféns (você esmaga!)<br>
+    • Resgate 64/64 numa fase para bônus PERFEITO</p>
+    <button class="btn primary" onclick="document.getElementById('helpOverlay').style.display='none'">↩ Voltar</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

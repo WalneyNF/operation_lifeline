@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Operation Lifeline - Jogo de resgate tático. Pilote o Hawk-Z e salve soldados em 3 campanhas épicas!">
+<meta name="author" content="Walney Moreira Klein">
+<meta property="og:title" content="🚁 Operation Lifeline - Jogo de Resgate Tático">
+<meta property="og:description" content="Pilote o Hawk-Z e salve 120 soldados em 3 campanhas épicas! Jogo grátis no navegador.">
+<meta property="og:type" content="website">
+<title>🚁 Operation Lifeline - Divulgação Oficial</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #0a0a12 0%, #1a1a2a 100%);
+    color: #eee;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(180deg, #0a0a12 0%, #0a3a0a 100%);
+    padding: 40px 20px;
+    text-align: center;
+    border-bottom: 3px solid #0f0;
+    box-shadow: 0 0 40px rgba(0, 255, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent 0 40px,
+      rgba(0, 255, 0, 0.03) 40px 80px
+    );
+    pointer-events: none;
+  }
+  header h1 {
+    font-size: clamp(28px, 6vw, 56px);
+    color: #0f0;
+    text-shadow: 0 0 30px #0f0, 0 0 60px #0a0;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  @keyframes glow {
+    from { text-shadow: 0 0 30px #0f0, 0 0 60px #0a0; }
+    to { text-shadow: 0 0 50px #0f0, 0 0 80px #0a0, 0 0 100px #0a0; }
+  }
+  header .subtitle {
+    font-size: clamp(14px, 2.5vw, 22px);
+    color: #f44;
+    font-weight: bold;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  header .tagline {
+    margin-top: 20px;
+    color: #aaa;
+    font-size: 16px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* SECTIONS */
+  section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 50px 20px;
+  }
+  section h2 {
+    color: #0f0;
+    font-size: clamp(22px, 4vw, 34px);
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #0f0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  section h2::before {
+    content: '▶';
+    color: #ff0;
+    font-size: 0.7em;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* HERO / CTA */
+  .hero-cta {
+    text-align: center;
+    padding: 30px 20px;
+    background: rgba(0, 255, 0, 0.05);
+    border: 2px solid #0f0;
+    border-radius: 12px;
+    margin: 30px 0;
+  }
+  .hero-cta p {
+    font-size: 18px;
+    color: #ff0;
+    margin-bottom: 20px;
+  }
+  .btn-play {
+    display: inline-block;
+    background: linear-gradient(135deg, #0f0, #0a0);
+    color: #000;
+    padding: 18px 50px;
+    font-size: 22px;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .btn-play:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 50px rgba(0, 255, 0, 0.9);
+  }
+
+  /* SCREENSHOTS */
+  .screenshots {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+  }
+  .screenshot {
+    background: #0a1a0a;
+    border: 3px solid #0f0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    transition: transform 0.3s;
+  }
+  .screenshot:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 40px rgba(0, 255, 0, 0.6);
+  }
+  .screenshot img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    background: #000;
+  }
+  .screenshot .caption {
+    padding: 10px;
+    text-align: center;
+    color: #0f0;
+    font-size: 13px;
+    background: #0a0a12;
+  }
+
+  /* FEATURES GRID */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+  }
+  .feature-card {
+    background: rgba(0, 255, 0, 0.05);
+    border: 2px solid #0f0;
+    border-radius: 10px;
+    padding: 22px;
+    transition: all 0.3s;
+  }
+  .feature-card:hover {
+    background: rgba(0, 255, 0, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0, 255, 0, 0.2);
+  }
+  .feature-card .icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  .feature-card h3 {
+    color: #ff0;
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+  .feature-card p {
+    color: #bbb;
+    font-size: 14px;
+  }
+
+  /* CONTROLS */
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin-top: 25px;
+  }
+  .control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #0a1a0a;
+    border-left: 4px solid #0f0;
+    padding: 10px 14px;
+    border-radius: 6px;
+  }
+  .control .key {
+    background: #0f0;
+    color: #000;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 13px;
+    min-width: 60px;
+    text-align: center;
+    box-shadow: 0 2px 0 #080;
+  }
+  .control .desc {
+    color: #ddd;
+    font-size: 13px;
+  }
+
+  /* SOCIAL SHARE */
+  .share-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 25px;
+    justify-content: center;
+  }
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+  }
+  .share-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  }
+  .share-btn.facebook  { background: #1877f2; }
+  .share-btn.instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+  .share-btn.whatsapp  { background: #25d366; }
+  .share-btn.twitter   { background: #000; border: 1px solid #444; }
+  .share-btn.telegram  { background: #0088cc; }
+  .share-btn.reddit    { background: #ff4500; }
+  .share-btn.copy      { background: #444; }
+
+  /* MESSAGE TEMPLATES */
+  .message-box {
+    background: #0a1a0a;
+    border: 2px solid #0f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 15px 0;
+    position: relative;
+  }
+  .message-box .label {
+    color: #ff0;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .message-box .text {
+    color: #ddd;
+    font-size: 14px;
+    white-space: pre-wrap;
+    line-height: 1.7;
+    padding-right: 80px;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #0f0;
+    color: #000;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover {
+    background: #6f6;
+  }
+  .copy-btn.copied {
+    background: #ff0;
+  }
+
+  /* ABOUT */
+  .about-box {
+    background: rgba(0, 255, 0, 0.05);
+    border-left: 4px solid #0f0;
+    padding: 20px 25px;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+  .about-box p {
+    color: #ccc;
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+  .about-box strong {
+    color: #0f0;
+  }
+
+  /* FOOTER */
+  footer {
+    background: #050508;
+    padding: 30px 20px;
+    text-align: center;
+    border-top: 2px solid #0f0;
+    margin-top: 40px;
+  }
+  footer .credits {
+    color: #888;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  footer .author {
+    color: #0f0;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  footer .contact {
+    color: #ff0;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  footer .contact:hover {
+    text-decoration: underline;
+  }
+  footer .version {
+    display: inline-block;
+    margin-top: 10px;
+    background: #0a3a0a;
+    color: #0f0;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    border: 1px solid #0f0;
+  }
+
+  /* TOAST */
+  #toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #0f0;
+    color: #000;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 15px;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
+    opacity: 0;
+    transition: all 0.4s;
+    z-index: 999;
+    pointer-events: none;
+  }
+  #toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    section { padding: 30px 15px; }
+    .share-btn { padding: 10px 16px; font-size: 12px; }
+    .message-box .text { padding-right: 0; padding-top: 35px; }
+    .copy-btn { top: 8px; right: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <h1>🚁 OPERATION LIFELINE 🚁</h1>
+  <div class="subtitle">Uma Missão Para Salvar Vidas</div>
+  <p class="tagline">
+    Pilote o helicóptero Hawk-Z em 3 campanhas épicas, resgate 120 soldados aliados,
+    enfrente chefes gigantes e prove que você é o melhor piloto de resgate da história!
+  </p>
+</header>
+
+<!-- CTA PRINCIPAL -->
+<section>
+  <div class="hero-cta">
+    <p>🎮 Jogo 100% grátis — Roda direto no navegador, sem instalar nada!</p>
+    <a href="operation-lifeline.html" class="btn-play" id="playBtn">▶ JOGAR AGORA</a>
+  </div>
+</section>
+
+<!-- SOBRE O JOGO -->
+<section>
+  <h2>Sobre o Jogo</h2>
+  <div class="about-box">
+    <p>
+      <strong>Operation Lifeline</strong> é um jogo de resgate tático inspirado no clássico
+      <em>Choplifter</em> de 1982. Você pilota um helicóptero militar numa missão humanitária:
+      resgatar soldados aliados presos em território inimigo.
+    </p>
+    <p>
+      Mas cuidado — o inimigo não vai te deixar levar eles fácil. Tanques, aviões de caça,
+      submarinos, minas aéreas e até <strong>zumbis</strong> vão tentar impedir o resgate.
+    </p>
+    <p>
+      Com <strong>mecânicas únicas</strong> como o gancho de resgate, mira em 4 direções,
+      upgrades, chefes e modo história, o jogo oferece horas de diversão para quem gosta
+      de ação estratégica.
+    </p>
+  </div>
+</section>
+
+<!-- SCREENSHOTS -->
+<section>
+  <h2>📸 Imagens do Jogo</h2>
+  <div class="screenshots">
+    <div class="screenshot">
+      <img src="screenshot1.png" alt="Operation Lifeline - Tela principal" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=caption>📸 Coloque aqui seu screenshot da tela principal</div>';">
+      <div class="caption">🏠 Tela Principal</div>
+    </div>
+    <div class="screenshot">
+      <img src="screenshot2.png" alt="Operation Lifeline - Fase Deserto" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=caption>📸 Coloque aqui seu screenshot da fase Deserto</div>';">
+      <div class="caption">🌵 Fase 1 — Deserto</div>
+    </div>
+    <div class="screenshot">
+      <img src="screenshot3.png" alt="Operation Lifeline - Resgate" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=caption>📸 Coloque aqui seu screenshot de resgate</div>';">
+      <div class="caption">🪝 Resgate em Ação</div>
+    </div>
+  </div>
+  <p style="text-align:center; color:#666; font-size:12px; margin-top:15px">
+    💡 Dica: coloque os arquivos <code>screenshot1.png</code>, <code>screenshot2.png</code> e
+    <code>screenshot3.png</code> na mesma pasta desta página.
+  </p>
+</section>
+
+<!-- RECURSOS -->
+<section>
+  <h2>✨ O Que o Jogo Oferece</h2>
+  <div class="features">
+    <div class="feature-card">
+      <div class="icon">🎯</div>
+      <h3>Gancho de Resgate</h3>
+      <p>Baixe o gancho, prenda nos soldados e suba um a um. Sistema fiel ao clássico com animação suave.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🌍</div>
+      <h3>3 Campanhas Épicas</h3>
+      <p>Deserto, Mar e Neve — cada uma com cenário, música e inimigos únicos.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">💀</div>
+      <h3>Chefes Gigantes</h3>
+      <p>Enfrente Tanque Gigante, Cruzador de Guerra e Helicóptero Caça no final de cada campanha.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🧟</div>
+      <h3>Modo Zumbi</h3>
+      <p>Modo especial onde zumbis atacam os soldados e grudam no seu helicóptero. Sacuda eles!</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">💪</div>
+      <h3>Sistema de Upgrades</h3>
+      <p>Ganhe XP resgatando soldados e gaste em blindagem, capacidade, velocidade e muito mais.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🎖️</div>
+      <h3>Soldados com Nome</h3>
+      <p>Cada soldado tem nome, patente, idade e hometown. Alguns até falam ao serem resgatados!</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🚁</div>
+      <h3>3 Skins de Helicóptero</h3>
+      <p>Verde Padrão, Stealth Cinza e Camuflado Deserto. Escolha seu estilo.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">💾</div>
+      <h3>Save Automático</h3>
+      <p>Feche o navegador e volte depois — seu progresso estará salvo.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🏆</div>
+      <h3>Medalhas e Ranking</h3>
+      <p>Resgate perfeito, abates, 100% — colecione conquistas e dispute o top 5.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTROLES -->
+<section>
+  <h2>🎮 Controles</h2>
+  <div class="controls">
+    <div class="control"><span class="key">← →</span><span class="desc">Mover para os lados</span></div>
+    <div class="control"><span class="key">↑ ↓</span><span class="desc">Subir / Descer</span></div>
+    <div class="control"><span class="key">A</span><span class="desc">Girar mira (4 direções)</span></div>
+    <div class="control"><span class="key">ESPAÇO</span><span class="desc">Atirar</span></div>
+    <div class="control"><span class="key">X</span><span class="desc">Descer gancho</span></div>
+    <div class="control"><span class="key">Z</span><span class="desc">Subir gancho</span></div>
+    <div class="control"><span class="key">C</span><span class="desc">Soldados te seguem</span></div>
+    <div class="control"><span class="key">V</span><span class="desc">Soldados se escondem</span></div>
+    <div class="control"><span class="key">Q</span><span class="desc">💣 Bomba especial</span></div>
+    <div class="control"><span class="key">E</span><span class="desc">🩹 Kit médico (+1 vida)</span></div>
+    <div class="control"><span class="key">TAB</span><span class="desc">🎯 Mira assistida</span></div>
+    <div class="control"><span class="key">ESC</span><span class="desc">Menu de configurações</span></div>
+  </div>
+</section>
+
+<!-- COMPARTILHAR -->
+<section>
+  <h2>📢 Compartilhe nas Redes Sociais</h2>
+  <p style="color:#aaa; margin-bottom:15px; text-align:center">
+    Ajude o jogo a chegar em mais pessoas! Clique nos botões abaixo:
+  </p>
+  <div class="share-buttons">
+    <a class="share-btn facebook" href="#" onclick="shareFacebook(event)">
+      <span>📘</span> Facebook
+    </a>
+    <a class="share-btn whatsapp" href="#" onclick="shareWhatsApp(event)">
+      <span>💬</span> WhatsApp
+    </a>
+    <a class="share-btn twitter" href="#" onclick="shareTwitter(event)">
+      <span>🐦</span> X / Twitter
+    </a>
+    <a class="share-btn telegram" href="#" onclick="shareTelegram(event)">
+      <span>✈️</span> Telegram
+    </a>
+    <a class="share-btn reddit" href="#" onclick="shareReddit(event)">
+      <span>👽</span> Reddit
+    </a>
+    <button class="share-btn instagram" onclick="shareInstagram(event)">
+      <span>📷</span> Instagram
+    </button>
+    <button class="share-btn copy" onclick="copyLink(event)">
+      <span>🔗</span> Copiar Link
+    </button>
+  </div>
+</section>
+
+<!-- TEXTOS PRONTOS PARA DIVULGAÇÃO -->
+<section>
+  <h2>📝 Textos Prontos para Divulgação</h2>
+  <p style="color:#aaa; margin-bottom:15px; text-align:center">
+    Clique em <strong style="color:#0f0">COPIAR</strong> em qualquer texto abaixo e cole na rede social que preferir!
+  </p>
+
+  <div class="message-box">
+    <button class="copy-btn" onclick="copyText(this, 'msg1')">📋 COPIAR</button>
+    <div class="label">🚀 Curto — Ideal para Twitter / X</div>
+    <div class="text" id="msg1">🚁 Acabei de lançar o jogo OPERATION LIFELINE!
+
+Pilote um helicóptero militar e resgate 120 soldados em 3 campanhas épicas.
+
+Grátis, roda no navegador, sem instalar nada!
+
+👉 Jogue agora: [SEU_LINK]
+
+#OperationLifeline #IndieGame #GameDev #JogoBrasileiro</div>
+  </div>
+
+  <div class="message-box">
+    <button class="copy-btn" onclick="copyText(this, 'msg2')">📋 COPIAR</button>
+    <div class="label">💬 Médio — Ideal para WhatsApp</div>
+    <div class="text" id="msg2">🎮 GALERA, OLHEM ISSO!
+
+Criei um jogo chamado OPERATION LIFELINE 🚁
+
+É um jogo de resgate onde você pilota um helicóptero militar e precisa salvar soldados presos em território inimigo.
+
+TEM:
+✅ 3 campanhas (Deserto, Mar, Neve)
+✅ Chefes gigantes
+✅ Modo Zumbi 🧟
+✅ Sistema de upgrades
+✅ Grátis e roda no navegador!
+
+Joga aí e me diz o que achou:
+👉 [SEU_LINK]
+
+Feito por Walney Moreira Klein 💚</div>
+  </div>
+
+  <div class="message-box">
+    <button class="copy-btn" onclick="copyText(this, 'msg3')">📋 COPIAR</button>
+    <div class="label">📘 Longo — Ideal para Facebook</div>
+    <div class="text" id="msg3">🎮 LANÇAMENTO: OPERATION LIFELINE 🚁
+
+Amigos, é com muito orgulho que apresento meu novo jogo: OPERATION LIFELINE!
+
+📖 A HISTÓRIA
+Você é o piloto do Hawk-Z, um helicóptero militar enviado em uma missão humanitária: resgatar soldados aliados presos em território inimigo. Mas o caminho não será fácil — tanques, aviões, submarinos e até ZUMBIS vão tentar impedir você!
+
+✨ O QUE TEM NO JOGO
+🚁 Sistema de gancho de resgate (pegue os soldados um a um)
+🌵 3 campanhas: Deserto, Mar e Neve
+💀 3 chefes épicos: Tanque Gigante, Cruzador de Guerra e Helicóptero Caça
+🧟 Modo Zumbi especial
+💪 Sistema de upgrades (blindagem, capacidade, velocidade)
+🎖️ Cada soldado tem nome, idade e hometown
+🏆 Sistema de medalhas e ranking
+💾 Save automático
+🎵 Sons e música gerados em tempo real
+
+🎮 TOTALMENTE GRÁTIS
+Roda direto no navegador, sem instalar nada! Funciona em PC e notebook.
+
+👉 Jogue agora: [SEU_LINK]
+
+Se gostar, compartilhe com seus amigos! Todo feedback é bem-vindo 💚
+
+— Walney Moreira Klein
+📧 walneyk@hotmail.com</div>
+  </div>
+
+  <div class="message-box">
+    <button class="copy-btn" onclick="copyText(this, 'msg4')">📋 COPIAR</button>
+    <div class="label">📷 Instagram — Legenda com Emojis</div>
+    <div class="text" id="msg4">🚁 NOVO JOGO BRASILEIRO DISPONÍVEL! 🇧🇷
+
+Apresento OPERATION LIFELINE — um jogo de resgate tático inspirado no clássico Choplifter!
+
+🎯 Sua missão: pilotar o Hawk-Z e salvar 120 soldados em 3 campanhas diferentes.
+
+O que você vai encontrar:
+🌵 Fase Deserto
+🌊 Fase Mar
+❄️ Fase Neve
+💀 3 chefes épicos
+🧟 Modo Zumbi
+💪 Upgrades
+🏆 Medalhas
+
+🎮 100% GRÁTIS!
+💻 Roda no navegador
+📱 Sem instalar nada
+
+👉 Link na bio ou comente "QUERO" que eu mando!
+
+#OperationLifeline #JogoIndie #GameDev #IndieGame #JogoBrasileiro #Choplifter #RetroGaming #Gaming #Games #JogoGratis #WebGame #HTML5</div>
+  </div>
+
+  <div class="message-box">
+    <button class="copy-btn" onclick="copyText(this, 'msg5')">📋 COPIAR</button>
+    <div class="label">👽 Reddit — Post para r/IndieGaming ou r/gamedev</div>
+    <div class="text" id="msg5">[PC] [HTML5] I made a Choplifter-inspired game called "Operation Lifeline" — free in browser!
+
+Hey everyone!
+
+I've been working on a tactical rescue game inspired by the classic Choplifter (1982). It's called **Operation Lifeline**.
+
+**What makes it unique:**
+- Hook rescue mechanic (one soldier at a time, like the original)
+- 3 campaigns: Desert, Sea, Snow
+- 3 bosses: Giant Tank, Warship, Hunter Helicopter
+- Zombie mode
+- Upgrade system (XP earned per rescue)
+- Named soldiers (each has rank, age, hometown)
+- Medal system, ranking, auto-save
+- All audio generated via Web Audio API (no asset files!)
+
+**Tech stack:** Pure HTML5 Canvas + JavaScript. No frameworks.
+
+**Play it here:** [SEU_LINK]
+
+Any feedback is welcome! Especially about difficulty balance and controls.
+
+Thanks!</div>
+  </div>
+
+  <div class="message-box">
+    <button class="copy-btn" onclick="copyText(this, 'msg6')">📋 COPIAR</button>
+    <div class="label">🎮 Discord — Post curto para servidores de games</div>
+    <div class="text" id="msg6">🚁 LANÇAMENTO: Operation Lifeline
+
+Fiz um jogo de resgate tático inspirado no clássico Choplifter!
+
+🎯 Você pilota um helicóptero militar
+🪝 Resgata soldados com gancho (um a um)
+💀 Enfrenta chefes gigantes
+🧟 Modo zumbi incluso
+💪 Upgrades, medalhas, ranking
+💾 Save automático
+🎮 100% grátis no navegador
+
+👉 [SEU_LINK]
+
+Bora testar e me dar feedback? 🚀</div>
+  </div>
+</section>
+
+<!-- COMO AJUDAR -->
+<section>
+  <h2>💚 Como Você Pode Ajudar</h2>
+  <div class="features">
+    <div class="feature-card">
+      <div class="icon">🎮</div>
+      <h3>Jogue</h3>
+      <p>Experimente o jogo e divirta-se! Cada partida é uma nova aventura.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📢</div>
+      <h3>Compartilhe</h3>
+      <p>Use os botões acima para compartilhar nas redes sociais com um clique.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">💬</div>
+      <h3>Dê Feedback</h3>
+      <p>Encontrou um bug? Tem uma ideia? Manda e-mail para <strong>walneyk@hotmail.com</strong>.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">⭐</div>
+      <h3>Avalie</h3>
+      <p>Deixe sua opinião nas redes sociais e ajude o jogo a chegar em mais pessoas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="credits">
+    <div class="author">🚁 Operation Lifeline</div>
+    <p style="margin-top:8px">
+      Desenvolvido por <span class="author">Walney Moreira Klein</span>
+    </p>
+    <p>
+      📧 <a href="mailto:walneyk@hotmail.com" class="contact">walneyk@hotmail.com</a>
+    </p>
+    <p style="margin-top:15px; color:#555; font-size:12px">
+      Inspirado no clássico Choplifter (1982) de Dan Gorlin
+    </p>
+    <div class="version">Versão 0.7</div>
+  </div>
+</footer>
+
+<!-- TOAST -->
+<div id="toast">✅ Link copiado!</div>
+
+<script>
+  // ============================================================
+  // URL DO JOGO — MUDE AQUI PARA O SEU LINK REAL
+  // ============================================================
+  const GAME_URL = window.location.origin + window.location.pathname.replace('divulgacao.html', 'operation-lifeline.html').replace('divulgacao', '');
+
+  // ============================================================
+  // COMPARTILHAMENTO
+  // ============================================================
+  function shareFacebook(e) {
+    e.preventDefault();
+    const url = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(GAME_URL);
+    window.open(url, '_blank', 'width=600,height=400');
+  }
+
+  function shareWhatsApp(e) {
+    e.preventDefault();
+    const text = '🚁 OLHA ESSE JOGO: Operation Lifeline!\n\nPilote um helicóptero militar e resgate 120 soldados em 3 campanhas épicas!\n\nGrátis no navegador:\n' + GAME_URL;
+    const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+    window.open(url, '_blank');
+  }
+
+  function shareTwitter(e) {
+    e.preventDefault();
+    const text = '🚁 Acabei de conhecer o jogo OPERATION LIFELINE! Pilote um helicóptero militar e resgate soldados em 3 campanhas épicas. Grátis no navegador! #OperationLifeline #IndieGame';
+    const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(GAME_URL);
+    window.open(url, '_blank', 'width=600,height=400');
+  }
+
+  function shareTelegram(e) {
+    e.preventDefault();
+    const text = '🚁 Operation Lifeline — Jogo de resgate tático grátis!';
+    const url = 'https://t.me/share/url?url=' + encodeURIComponent(GAME_URL) + '&text=' + encodeURIComponent(text);
+    window.open(url, '_blank');
+  }
+
+  function shareReddit(e) {
+    e.preventDefault();
+    const title = '🚁 Operation Lifeline — Jogo de resgate tático inspirado em Choplifter';
+    const url = 'https://www.reddit.com/submit?url=' + encodeURIComponent(GAME_URL) + '&title=' + encodeURIComponent(title);
+    window.open(url, '_blank');
+  }
+
+  function shareInstagram(e) {
+    e.preventDefault();
+    // Instagram não permite compartilhar link direto — copia o link e avisa
+    copyToClipboard(GAME_URL);
+    showToast('📷 Link copiado! Cole no seu story ou bio do Instagram');
+  }
+
+  function copyLink(e) {
+    e.preventDefault();
+    copyToClipboard(GAME_URL);
+    showToast('✅ Link copiado!');
+  }
+
+  function copyText(btn, id) {
+    const text = document.getElementById(id).innerText;
+    // Substitui o placeholder pelo link real
+    const finalText = text.replace(/\[SEU_LINK\]/g, GAME_URL);
+    copyToClipboard(finalText);
+    btn.textContent = '✅ COPIADO!';
+    btn.classList.add('copied');
+    showToast('✅ Texto copiado! Cole onde quiser.');
+    setTimeout(() => {
+      btn.textContent = '📋 COPIAR';
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  let toastTimer = null;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>
